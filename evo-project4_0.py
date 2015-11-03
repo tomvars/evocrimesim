@@ -1,6 +1,4 @@
-import pygame
-import random
-import copy
+import pygame, random, copy, time
 import numpy as np
 import pylab as pl
 from mpl_toolkits.mplot3d import axes3d
@@ -8,7 +6,6 @@ import matplotlib.colors as colors
 from collections import Counter
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-import time
 #from matplotlib.pylab import *
 # Define some colors
 BLACK    = (   0,   0,   0)
@@ -28,13 +25,12 @@ height = 15
 margin = 0
 grid_x=50
 grid_y=50
-# Create a 2 dimensional array. A two dimensional
-# array is simply a list of lists.
+
 grid = []
 road_grid = []
 searchorder=[1,2,3,4] #Initial vision
 road_distribution=1.0
-arrest_map =[[0 for i in range(int(grid_x))] for i in range(int(grid_y))]
+arrest_map =[[0 for i in range(int(grid_x))] for i in range(int(grid_y))] # Create a 2 dimensional array.
 for row in range(grid_x):
     # Add an empty array that will hold each cell
     # in this row
@@ -134,7 +130,6 @@ class Robber:
         directions=[]
         field_of_view=[1,1,1,1] #N S E W
         while True:
-            # print "new rob move"
             while self.housefound==False and self.route==[]:
                 position=0
                 while position<=self.vision:
@@ -143,15 +138,12 @@ class Robber:
                     for s in searchorder: #randomizes the order of the vision search
                         if s==1:
                             if road_grid[(self.x-position)%grid_x][(self.y)%grid_y]==0 and field_of_view[0]==1:
-                                # print "I can look north"
                                 if isinstance( grid[(self.x-position)%grid_x][(self.y+1)%grid_y], int )!=True:
                                     if grid[(self.x-position)%grid_x][(self.y+1)%grid_y].coprob=="hous":
                                         diffsign=1
-                                        # print "I see a house to the right"
                                 if isinstance( grid[ (self.x-position)%grid_x][self.y-1], int )!=True:
                                     if grid[(self.x-position)%grid_x][self.y-1].coprob=="hous":
                                         diffsign=-1
-                                        # print "I see a house to the left"
                                 if diffsign==1 or diffsign==-1:
                                     if grid[(self.x-position)%grid_x][(self.y+diffsign)%grid_y].robbed == False and grid[(self.x-position)%grid_x][(self.y+diffsign)%grid_y].beingrobbed == False:
                                         directions=['0' for i in range(position)]
@@ -160,11 +152,8 @@ class Robber:
                                             directions.append('1')
                                         elif diffsign==-1:
                                             directions.append('3')
-                                        # print directions
                                         xB = (self.x-position)%grid_x
                                         yB = (self.y+diffsign)%grid_y
-                                        # print "rob at:", self.x,self.y
-                                        # print "house spotted at", xB, yB
                                         break
                             else:
                                 field_of_view[0]=0
@@ -174,11 +163,9 @@ class Robber:
                                 if isinstance( grid[(self.x+position)%grid_x][(self.y+1)%grid_y], int )!=True:
                                     if grid[(self.x+position)%grid_x][(self.y+1)%grid_y].coprob=="hous":
                                         diffsign=1
-                                        # print "I see a house to the right"
                                 if isinstance( grid[ (self.x+position)%grid_x][self.y-1], int )!=True:
                                     if grid[(self.x+position)%grid_x][self.y-1].coprob=="hous":
                                         diffsign=-1
-                                        # print "I see a house to the left"
                                 if diffsign==1 or diffsign==-1:
                                     if grid[(self.x+position)%grid_x][(self.y+diffsign)%grid_y].robbed == False and grid[(self.x+position)%grid_x][(self.y+diffsign)%grid_y].beingrobbed == False:
                                         directions=['2' for i in range(position)]
@@ -187,12 +174,8 @@ class Robber:
                                             directions.append('1')
                                         elif diffsign==-1:
                                             directions.append('3')
-                                        # print directions
                                         xB = (self.x+position)%grid_x
                                         yB = (self.y+diffsign)%grid_y
-                                        # print "rob at:", self.x,self.y
-                                        # print "house spotted at", xB, yB
-                                        # print "b"
                                         break
                             else:
                                 field_of_view[1]=0
@@ -202,11 +185,9 @@ class Robber:
                                 if isinstance( grid[(self.x+1)%grid_x][(self.y+position)%grid_y], int )!=True:
                                     if grid[(self.x+1)%grid_x][ (self.y+position)%grid_y ].coprob=="hous":
                                         diffsign=1
-                                        # print "I see a house south"
                                 if isinstance( grid[self.x-1][(self.y+position)%grid_y], int )!=True:
                                     if grid[self.x-1][ (self.y+position)%grid_y ].coprob=="hous":
                                         diffsign=-1
-                                        # print "I see a house north"
                                 if diffsign==1 or diffsign==-1:
                                     if grid[(self.x+diffsign)%grid_x][(self.y+position)%grid_y ].robbed == False and grid[(self.x+diffsign)%grid_x][(self.y+position)%grid_y ].beingrobbed == False:
                                         directions=['1' for i in range(position)]
@@ -215,12 +196,8 @@ class Robber:
                                             directions.append('2')
                                         elif diffsign==-1:
                                             directions.append('0')
-                                        # print directions
                                         xB = (self.x+diffsign)%grid_x
                                         yB = (self.y+position)%grid_y
-                                        # print "rob at:", self.x,self.y
-                                        # print "house spotted at", xB, yB
-                                        # print "c"
                                         break
                             else:
                                 field_of_view[2]=0
@@ -230,11 +207,9 @@ class Robber:
                                 if isinstance( grid[(self.x+1)%grid_x][(self.y-position)%grid_y], int )!=True:
                                     if grid[(self.x+1)%grid_x][ (self.y-position)%grid_y ].coprob=="hous":
                                         diffsign=1
-                                        # print "I see a house south"
                                 if isinstance( grid[self.x-1][(self.y-position)%grid_y], int )!=True:
                                     if grid[self.x-1][ (self.y-position)%grid_y ].coprob=="hous":
                                         diffsign=-1
-                                        # print "I see a house north"
                                 if diffsign==1 or diffsign==-1:
                                     if grid[(self.x+diffsign)%grid_x][(self.y-position)%grid_y ].robbed == False and grid[(self.x+diffsign)%grid_x][(self.y-position)%grid_y ].beingrobbed == False:
                                         directions=['3' for i in range(position)]
@@ -243,26 +218,18 @@ class Robber:
                                             directions.append('2')
                                         elif diffsign==-1:
                                             directions.append('0')
-                                        # print directions
                                         xB = (self.x+diffsign)%grid_x
                                         yB = (self.y-position)%grid_y
-                                        # print "rob at:", self.x,self.y
-                                        # print "house spotted at", xB, yB
-                                        # print "d"
                                         break
                             else:
                                 field_of_view[3]=0
                 break
-            # print "housefound:",self.housefound
             if self.housefound==True:
                 try:
-                    # self.route=pathfind(grid,xB,yB,self.x,self.y,self.vision)
                     self.route=directions
-                    # print "route:",self.route
                     self.housefound=False
                 except UnboundLocalError:
                     print "xb error"
-                # print "final directions:",self.route
             if len(self.route)>1:
                 i=self.route[0]
                 new_randx=self.x
@@ -281,9 +248,7 @@ class Robber:
                     if robprob>1:
                         robprob=1
                     if grid[new_randx][new_randy].coprob=="civ" and random.random()<robprob:
-                        # print "recruitment at (%s,%s)" % (new_randx,new_randy)
                         self.recruit(grid[new_randx][new_randy])
-                        # grid[new_randx][new_randy]=self
                 grid[new_randx][new_randy]=self
                 self.x=new_randx
                 self.y=new_randy
@@ -322,7 +287,6 @@ class Robber:
                         if isinstance( grid[ (self.x+position)%grid_x ][(self.y)%grid_y], int )!=True:
                             if grid[(self.x+position)%grid_x][(self.y)%grid_y].coprob=="cop": #look along row
                                 self.copseen=True
-                                # print "cop seen2"
                 if isinstance( grid[new_randx][new_randy], int )!=True:
                     if grid[new_randx][new_randy].coprob=="hous":
                         if grid[new_randx][new_randy].robbed==False and grid[new_randx][new_randy].beingrobbed==False:
@@ -343,15 +307,12 @@ class Robber:
             new_randx=(self.x+xdiff)%grid_x
             new_randy=(self.y+ydiff)%grid_y
             if road_grid[new_randx][new_randy]==0:
-                # print "what was on the grid:", grid[self.x][self.y]
                 grid[self.x][self.y]=0
                 if isinstance( grid[new_randx][new_randy], int )!=True:
                     robprob=float(self.money)/float(200)
                     if robprob>1:
                         robprob=1
-                    # print robprob
                     if grid[new_randx][new_randy].coprob=="civ" and random.random()<robprob:
-                        # print "recruitment at (%s,%s)" % (new_randx,new_randy)
                         self.recruit(grid[new_randx][new_randy])
                         grid[new_randx][new_randy]=self
                 grid[new_randx][new_randy]=self
@@ -360,7 +321,6 @@ class Robber:
             elif isinstance( grid[new_randx][new_randy], int )!=True:
                 if grid[new_randx][new_randy].coprob=="hous":
                     if grid[new_randx][new_randy].robbed==False and grid[new_randx][new_randy].beingrobbed==False:
-                        # print 'house robbed at (%s,%s)' % (new_randx, new_randy)
                         self.robbing=True
                         crime_map[int(new_randx%grid_x) ][int(new_randy%grid_y)] += 1
                         grid[new_randx][new_randy].rob(self.rob_speed)
@@ -383,7 +343,6 @@ class Robber:
         global civilians
         global evo
         generation=self.generation+1
-        # print "generation:", generation
         if evo==True:
             speed,rob_speed,vision= self.get_new_genes()
             robbers.append(Robber(self.x,self.y,self.coprob, speed, rob_speed,generation, vision)) #clone new robber
@@ -429,7 +388,6 @@ class Cop:
         global housearrests
         global searchorder
         while True:
-            # print "new move"
             while self.robfound==False and self.route==[]:
                 position=0
                 directions=[]
@@ -441,17 +399,16 @@ class Cop:
                     for s in searchorder:
                         if s==1:
                             if road_grid[(self.x-position)%grid_x][(self.y)%grid_y]==0 and field_of_view[0]==1:
-                                # print "I can look north"
                                 if isinstance( grid[(self.x-position)%grid_x][(self.y+1)%grid_y], int )!=True:
                                     if grid[(self.x-position)%grid_x][(self.y+1)%grid_y].coprob=="hous":
                                         if grid[(self.x-position)%grid_x][(self.y+1)%grid_y].beingrobbed==True:
                                             diffsign=1
-                                            # print "I see a house to the right"
+                                            # "I see a house to the right"
                                 if isinstance( grid[ (self.x-position)%grid_x][self.y-1], int )!=True:
                                     if grid[(self.x-position)%grid_x][self.y-1].coprob=="hous":
                                         if grid[(self.x-position)%grid_x][self.y-1].beingrobbed==True:
                                             diffsign=-1
-                                            # print "I see a house to the left"
+                                            # "I see a house to the left"
                                 if diffsign==1 or diffsign==-1:
                                     if grid[(self.x-position)%grid_x][(self.y+diffsign)%grid_y].beingrobbed == True:
                                         directions=['0' for i in range(position)]
@@ -460,11 +417,8 @@ class Cop:
                                             directions.append('1')
                                         elif diffsign==-1:
                                             directions.append('3')
-                                        # print directions
                                         xB = (self.x-position)%grid_x
                                         yB = (self.y+diffsign)%grid_y
-                                        # print "cop at:", self.x,self.y
-                                        # print "house spotted at", xB, yB
                                         break
                             else:
                                 field_of_view[0]=0
@@ -475,11 +429,11 @@ class Cop:
                                 if isinstance( grid[(self.x+position)%grid_x][(self.y+1)%grid_y], int )!=True:
                                     if grid[(self.x+position)%grid_x][(self.y+1)%grid_y].coprob=="hous":
                                         diffsign=1
-                                        # print "I see a house to the right"
+                                        #"I see a house to the right"
                                 if isinstance( grid[ (self.x+position)%grid_x][self.y-1], int )!=True:
                                     if grid[(self.x+position)%grid_x][self.y-1].coprob=="hous":
                                         diffsign=-1
-                                        # print "I see a house to the left"
+                                        #"I see a house to the left"
                                 if diffsign==1 or diffsign==-1:
                                     if grid[(self.x+position)%grid_x][(self.y+diffsign)%grid_y].beingrobbed == True:
                                         directions=['2' for i in range(position)]
@@ -488,12 +442,8 @@ class Cop:
                                             directions.append('1')
                                         elif diffsign==-1:
                                             directions.append('3')
-                                        # print directions
                                         xB = (self.x+position)%grid_x
                                         yB = (self.y+diffsign)%grid_y
-                                        # print "cop at:", self.x,self.y
-                                        # print "house spotted at", xB, yB
-                                        # print "b"
                                         break
                             else:
                                 field_of_view[1]=0
@@ -503,11 +453,11 @@ class Cop:
                                 if isinstance( grid[(self.x+1)%grid_x][(self.y+position)%grid_y], int )!=True:
                                     if grid[(self.x+1)%grid_x][ (self.y+position)%grid_y ].coprob=="hous":
                                         diffsign=1
-                                        # print "I see a house south"
+                                        # "I see a house south"
                                 if isinstance( grid[self.x-1][(self.y+position)%grid_y], int )!=True:
                                     if grid[self.x-1][ (self.y+position)%grid_y ].coprob=="hous":
                                         diffsign=-1
-                                        # print "I see a house north"
+                                        # "I see a house north"
                                 if diffsign==1 or diffsign==-1:
                                     if grid[(self.x+diffsign)%grid_x][(self.y+position)%grid_y ].beingrobbed == True:
                                         directions=['1' for i in range(position)]
@@ -516,12 +466,9 @@ class Cop:
                                             directions.append('2')
                                         elif diffsign==-1:
                                             directions.append('0')
-                                        # print directions
                                         xB = (self.x+diffsign)%grid_x
                                         yB = (self.y+position)%grid_y
-                                        # print "cop at:", self.x,self.y
-                                        # print "house spotted at", xB, yB
-                                        # print "c"
+                                        #"house spotted at", xB, yB
                                         break
                             else:
                                 field_of_view[2]=0
@@ -531,11 +478,11 @@ class Cop:
                                 if isinstance( grid[(self.x+1)%grid_x][(self.y-position)%grid_y], int )!=True:
                                     if grid[(self.x+1)%grid_x][ (self.y-position)%grid_y ].coprob=="hous":
                                         diffsign=1
-                                        # print "I see a house south"
+                                        #"I see a house south"
                                 if isinstance( grid[self.x-1][(self.y-position)%grid_y], int )!=True:
                                     if grid[self.x-1][ (self.y-position)%grid_y ].coprob=="hous":
                                         diffsign=-1
-                                        # print "I see a house north"
+                                        #"I see a house north"
                                 if diffsign==1 or diffsign==-1:
                                     if grid[(self.x+diffsign)%grid_x][(self.y-position)%grid_y ].beingrobbed == True:
                                         directions=['3' for i in range(position)]
@@ -544,26 +491,19 @@ class Cop:
                                             directions.append('2')
                                         elif diffsign==-1:
                                             directions.append('0')
-                                        # print directions
                                         xB = (self.x+diffsign)%grid_x
                                         yB = (self.y-position)%grid_y
-                                        # print "cop at:", self.x,self.y
-                                        # print "house spotted at", xB, yB
-                                        # print "d"
+                                        # "house spotted at", xB, yB
                                         break
                             else:
                                 field_of_view[3]=0
                 break
-            # print "self.robfound:", self.robfound
             if self.robfound==True:
                 try:
-                    # self.route=pathfind(grid,xB,yB,self.x,self.y,self.vision)
                     self.route=directions
-                    # print "cop route:",self.route
                     self.robfound=False
                 except UnboundLocalError:
                     print "xb error"
-                # print "final directions:",self.route
             if len(self.route)>1:
                 i=self.route[0]
                 new_randx=self.x
@@ -572,7 +512,6 @@ class Cop:
                     if isinstance( grid[new_randx][new_randy], int )!=True:
                         copprob=float(self.arrest_counter**2)/float(2e4)
                         if grid[new_randx][new_randy].coprob=="civ" and random.random() < copprob:
-                            # print "recruitment at (%s,%s)" % (new_randx,new_randy)
                             self.recruit(grid[new_randx][new_randy])
                 grid[self.x][self.y]=0
                 if i=='0':
@@ -603,7 +542,6 @@ class Cop:
                 if isinstance( grid[new_randx][new_randy], int )!=True:
                     if grid[new_randx][new_randy].coprob=="hous":
                         if grid[new_randx][new_randy].beingrobbed==True:
-                            # print 'house robbed at (%s,%s)' % (new_randx, new_randy)
                             for rob in robbers:
                                 if len(rob.housecoords)>0:
                                     if rob.housecoords[0]==new_randx and rob.housecoords[1]==new_randy:
@@ -633,7 +571,6 @@ class Cop:
                     if isinstance( grid[new_randx][new_randy], int )!=True:
                         copprob=float(self.arrest_counter**2)/float(2e4)
                         if grid[new_randx][new_randy].coprob=="civ" and random.random() < copprob:
-                            # print "recruitment at (%s,%s)" % (new_randx,new_randy)
                             self.recruit(grid[new_randx][new_randy])
                 if isinstance( grid[new_randx][new_randy], int )!=True:
                     arrestprob=self.speed/40
@@ -678,7 +615,6 @@ class Cop:
         global cop_evo
 
         generation=self.generation+1
-        # print "generation:", generation
         if cop_evo==True:
             speed, vision= self.get_new_genes()
             cops.append(Cop(self.x,self.y,self.coprob, speed, vision, generation, self.arrest_counter)) #clone new cop
@@ -769,9 +705,7 @@ class Town(House):
             a,b=get_start_coords("h", self.number_of_clusters, self.clusters)
             self.houses.append(House(a,b,False))
         return self.houses
-# print Gotham.houses
-# print Gotham.clusters
-# print Gotham.number_of_clusters
+
 clusters = True
 global number_of_clusters
 number_of_clusters = 1
@@ -813,16 +747,11 @@ for x in range(number_of_robbers):
 for x in range(number_of_civs):
     a,b=get_start_coords("p")
     civilians.append(Civilian(a,b,"civ"))
-# for x in range(number_of_houses):
-#     a,b=get_start_coords("h")
-#     houses.append(House(a,b,False))
 num_houses,num_robbers,num_civs,num_housearrests,num_streetarrests,num_cops=[],[],[],[],[],[]
 
 counter=0
 Gotham=Town(number_of_houses, number_of_clusters)
-print len(Gotham.houses)
-# Gotham.houses=Gotham.get_houses()
-print len(Gotham.houses)
+
 evo=True
 cop_evo2=True
 cop_evo=False
@@ -933,8 +862,6 @@ while done == False:
                         dic_Z=Counter(genes)
                     for i in dic_Z.keys():
                         var=i.split(',')
-                        # index_x=diff_s-(max_s-int(var[0]))
-                        # index_y=diff_r-(max_r-int(var[1]))
                         index_x=int(var[0])
                         index_y=int(var[1])
                         index_z=int(var[2])
@@ -1036,9 +963,6 @@ while done == False:
                 for i in Gotham.houses:
                     grid[i.x][i.y]=1
                     del i
-                # Gotham.get_houses()
-                # Gotham = Town(10, number_of_clusters)
-                # Gotham.get_houses()
                 Gotham=Town(number_of_houses, number_of_clusters)
             if event.key == pygame.K_m:
                 fig = pl.figure()
@@ -1222,7 +1146,6 @@ while done == False:
             for house in Gotham.houses:
                 if house.x==row and house.y==column:
                     print house
-            # print("Click ", pos, "Grid coordinates: ", row, column)
     while pause==False:
         ###FOR SIMULATION TO RUN 100,000 times###
         # if counter==1000000:
@@ -1362,8 +1285,6 @@ while done == False:
                     rob.rob_counter=0
             elif counter%rob.speed == 0:
                 rob.move()
-                # rob.money_collected=rob.money
-                # rob.money
                 rob.money -= (25/(rob.speed))**2+1
                 if rob.money<=0:
                     rob.die()

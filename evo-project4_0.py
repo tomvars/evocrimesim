@@ -1158,7 +1158,7 @@ while done == False:
             if cop_evo==True:
                 for i in cops:
                     i.arrest_count=0
-            print counter
+            print "Iteration number:",counter
             num_housearrests.append(housearrests)
             num_streetarrests.append(streetarrests)
             try:
@@ -1171,8 +1171,6 @@ while done == False:
                 print "there are 0 cops"
             housearrests=0
             streetarrests=0
-            print num_housearrests
-            print num_streetarrests
             if house_redistribute==True:
                 for i in Gotham.houses:
                     grid[i.x][i.y]=1
